@@ -1,3 +1,4 @@
+import CategoryIcon from "@/components/ui/CategoryIcon";
 import { supabase } from "@/lib/supabase";
 import { MenuSection } from "@/types/database";
 import StickyNavbar from "@/components/layout/StickyNavbar";
@@ -37,14 +38,17 @@ export default async function Home() {
                     <section
                         key={category.id}
                         id={`category-${category.id}`}
-                        className="scroll-mt-24" // Compensează offset-ul pentru StickyNavbar
+                        className="scroll-mt-24"
                     >
-                        <h2 className="text-2xl font-bold mb-6 text-neutral-100 uppercase tracking-wider">
+                        {/* 2. Adăugarea iconiței lângă titlul H2 */}
+                        <h2 className="flex items-center gap-3 text-2xl font-bold mb-6 text-neutral-100 uppercase tracking-wider border-b border-neutral-800 pb-2">
+              <span className="p-2 bg-neutral-900 rounded-lg text-orange-500">
+                <CategoryIcon name={category.name} className="w-6 h-6" />
+              </span>
                             {category.name}
                         </h2>
 
                         <div className="space-y-6">
-                            {/* Iterarea și montarea componentelor Client pentru preparate */}
                             {category.menu_items.map((item) => (
                                 <MenuItemCard key={item.id} item={item} />
                             ))}

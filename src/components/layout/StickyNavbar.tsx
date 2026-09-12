@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Category } from "@/types/database";
+import CategoryIcon from "@/components/ui/CategoryIcon";
 
 interface StickyNavbarProps {
     categories: Category[];
@@ -99,14 +100,16 @@ export default function StickyNavbar({ categories }: StickyNavbarProps) {
                             <button
                                 data-category={category.id}
                                 onClick={() => handleScrollTo(category.id)}
-                                className={`relative px-5 py-2.5 text-sm font-semibold rounded-full transition-colors duration-300 outline-none ${
+                                className={`relative px-5 py-2.5 text-sm font-semibold rounded-full transition-colors duration-300 outline-none flex items-center gap-2 ${
                                     isActive ? "text-neutral-950" : "text-neutral-400 hover:text-neutral-200"
                                 }`}
                             >
-                                {/* Textul butonului z-index relativ pentru a sta peste pastila magică */}
-                                <span className="relative z-10">{category.name}</span>
+                                {/* 2. Injectarea iconiței și a textului */}
+                                <span className="relative z-10 flex items-center gap-2">
+                  <CategoryIcon name={category.name} className="w-4 h-4" />
+                                    {category.name}
+                </span>
 
-                                {/* Pastila Magică (Framer Motion) */}
                                 {isActive && (
                                     <motion.div
                                         layoutId="activeCategoryPill"
