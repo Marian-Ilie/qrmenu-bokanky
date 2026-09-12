@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { MenuSection } from "@/types/database";
+import StickyNavbar from "@/components/layout/StickyNavbar";
 
 export const revalidate = 60; // Incremental Static Regeneration la 60 secunde
 
@@ -22,13 +23,16 @@ export default async function Home() {
     const typedCategories = categories as MenuSection[];
 
     return (
-        <main className="min-h-screen bg-neutral-950 text-neutral-50 p-4 md:p-8 max-w-3xl mx-auto">
-            <header className="mb-8">
+        <main className="min-h-screen bg-neutral-950 text-neutral-50 max-w-3xl mx-auto">
+            <header className="p-4 md:p-8 pb-0">
                 <h1 className="text-3xl font-bold text-orange-500">Bokanky</h1>
                 <p className="text-neutral-400">Restaurant Pizzerie</p>
             </header>
 
-            <div className="space-y-12">
+            {/* Montarea componentei client */}
+            <StickyNavbar categories={typedCategories} />
+
+            <div className="space-y-12 p-4 md:p-8 pt-6">
                 {typedCategories.map((category) => (
                     <section key={category.id} id={`category-${category.id}`}>
                         <h2 className="text-2xl font-bold mb-4 border-b border-neutral-800 pb-2">
