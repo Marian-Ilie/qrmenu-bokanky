@@ -24,7 +24,7 @@ export default async function Home() {
     const typedCategories = categories as MenuSection[];
 
     return (
-        <main className="min-h-screen bg-neutral-950 text-neutral-50 max-w-3xl mx-auto relative pb-24">
+        <main className="min-h-screen bg-neutral-950 text-neutral-50 max-w-3xl mx-auto relative pb-[50vh]">
             <header className="p-4 md:p-8 pb-4">
                 <h1 className="text-3xl font-bold text-orange-500 tracking-tight">Bokanky</h1>
                 <p className="text-neutral-400 font-medium mt-1">Restaurant Pizzerie</p>

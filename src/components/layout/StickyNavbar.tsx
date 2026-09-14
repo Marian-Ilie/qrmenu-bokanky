@@ -100,8 +100,8 @@ export default function StickyNavbar({ categories }: StickyNavbarProps) {
                             <button
                                 data-category={category.id}
                                 onClick={() => handleScrollTo(category.id)}
-                                className={`relative px-5 py-2.5 text-sm font-semibold rounded-full transition-colors duration-300 outline-none flex items-center gap-2 ${
-                                    isActive ? "text-neutral-950" : "text-neutral-400 hover:text-neutral-200"
+                                className={`relative px-6 py-3 text-base font-semibold rounded-full transition-colors duration-300 outline-none flex items-center gap-2.5 shadow-sm ${
+                                    isActive ? "text-neutral-950" : "text-neutral-400 hover:text-neutral-100"
                                 }`}
                             >
                                 {/* 2. Injectarea iconiței și a textului */}
