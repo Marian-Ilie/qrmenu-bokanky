@@ -1,60 +1,38 @@
-import CategoryIcon from "@/components/ui/CategoryIcon";
-import { supabase } from "@/lib/supabase";
-import { MenuSection } from "@/types/database";
-import StickyNavbar from "@/components/layout/StickyNavbar";
-import MenuItemCard from "@/components/ui/MenuItemCard";
+import MenuItemCard from '@/components/ui/MenuItemCard';
+import { MenuItem, LocaleKey } from '@/types/database';
 
-export const revalidate = 60; // ISR validation cache
+export default async function MenuPage({
+                                           params
+                                       }: {
+    params: Promise<{ locale: LocaleKey }>;
+}) {
+    const resolvedParams = await params;
+    const locale = resolvedParams.locale;
 
-export default async function Home() {
-    const { data: categories, error } = await supabase
-        .from('categories')
-        .select(`
-      *,
-      menu_items (*)
-    `)
-        .eq('menu_items.is_active', true)
-        .order('sort_order', { ascending: true })
-        .order('sort_order', { referencedTable: 'menu_items', ascending: true });
-
-    if (error) {
-        return <div className="p-4 text-red-500">Eroare critică DB: {error.message}</div>;
-    }
-
-    const typedCategories = categories as MenuSection[];
+    // Un obiect mock temporar strict pentru a valida UI-ul în Preview
+    const mockItem: MenuItem = {
+        id: 'test-1',
+        category_id: 'cat-1',
+        name: { ro: 'Pizza Margherita', en: 'Margherita Pizza' },
+        description: { ro: 'Aluat, sos roșii, mozzarella', en: 'Dough, tomato sauce, mozzarella' },
+        price: 35.00,
+        image_url: null,
+        is_bestseller: false,
+        nutritional_info: {
+            kcal: 740,
+            macros: { proteins: 26, fats: 23, carbs: 104, fiber: 6, salt: 2.2 },
+            allergens: ['gluten', 'lactoză'],
+            frozen_ingredients: []
+        }
+    };
 
     return (
-        <main className="min-h-screen bg-neutral-950 text-neutral-50 max-w-3xl mx-auto relative pb-[50vh] overflow-x-hidden">
-            <header className="p-4 md:p-8 pb-4">
-                <h1 className="text-3xl font-bold text-orange-500 tracking-tight">Bokanky</h1>
-                <p className="text-neutral-400 font-medium mt-1">Restaurant Pizzerie</p>
-            </header>
+        <main className="p-4 bg-black min-h-screen text-white flex flex-col gap-4">
+            {/* Aici va veni StickyNavbar */}
 
-            {/* Montarea componentei Client de navigare */}
-            <StickyNavbar categories={typedCategories} />
-
-            <div className="p-4 md:p-8 pt-8 space-y-12">
-                {typedCategories.map((category) => (
-                    <section
-                        key={category.id}
-                        id={`category-${category.id}`}
-                        className="scroll-mt-24"
-                    >
-                        {/* 2. Adăugarea iconiței lângă titlul H2 */}
-                        <h2 className="flex items-center gap-3 text-2xl font-bold mb-6 text-neutral-100 uppercase tracking-wider border-b border-neutral-800 pb-2">
-              <span className="p-2 bg-neutral-900 rounded-lg text-orange-500">
-                <CategoryIcon name={category.name} className="w-6 h-6" />
-              </span>
-                            {category.name}
-                        </h2>
-
-                        <div className="space-y-6">
-                            {category.menu_items.map((item) => (
-                                <MenuItemCard key={item.id} item={item} />
-                            ))}
-                        </div>
-                    </section>
-                ))}
+            <div className="pt-20 max-w-2xl mx-auto w-full">
+                {/* Validăm exact problema cu parametrul locale lipsă */}
+                <MenuItemCard item={mockItem} locale={locale} />
             </div>
         </main>
     );

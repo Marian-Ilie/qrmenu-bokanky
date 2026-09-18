@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ReactNode } from 'react';
+import { LocaleKey } from '@/types/database';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,16 +26,20 @@ export const viewport: Viewport = {
     themeColor: "#0a0a0a",
 };
 
-export default function RootLayout({
-                                       children,
-                                       params: { locale }
-                                   }: {
-    children: React.ReactNode;
-    params: { locale: string };
+export default async function RootLayout({
+                                             children,
+                                             params
+                                         }: {
+    children: ReactNode;
+    params: Promise<{ locale: LocaleKey }>;
 }) {
+    const resolvedParams = await params;
+
     return (
-        <html lang={locale}>
-        {/* ... */}
+        <html lang={resolvedParams.locale}>
+        <body className="min-h-full flex flex-col antialiased">
+        {children}
+        </body>
         </html>
     );
 }

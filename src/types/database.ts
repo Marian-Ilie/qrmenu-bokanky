@@ -18,6 +18,13 @@ export interface NutritionalInfo {
     frozen_ingredients: string[];
 }
 
+export interface Category {
+    id: string;
+    name: LocalizedText;
+    icon_name: string | null;
+    display_order: number;
+}
+
 export interface MenuItem {
     id: string;
     category_id: string;
