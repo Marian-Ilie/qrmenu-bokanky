@@ -4,10 +4,10 @@ import { MenuItem, LocaleKey } from '@/types/database';
 export default async function MenuPage({
                                            params
                                        }: {
-    params: Promise<{ locale: LocaleKey }>;
+    params: Promise<{ locale: string }>;
 }) {
-    const resolvedParams = await params;
-    const locale = resolvedParams.locale;
+    const { locale: rawLocale } = await params;
+    const locale = (['ro', 'en'].includes(rawLocale) ? rawLocale : 'ro') as LocaleKey;
 
     // Un obiect mock temporar strict pentru a valida UI-ul în Preview
     const mockItem: MenuItem = {
