@@ -34,10 +34,11 @@ export default async function RootLayout({
     params: Promise<{ locale: LocaleKey }>;
 }) {
     const resolvedParams = await params;
+    const locale = (resolvedParams.locale || 'ro') as LocaleKey;
 
     return (
-        <html lang={resolvedParams.locale}>
-        <body className="min-h-full flex flex-col antialiased">
+        <html lang={locale}>
+        <body className="min-h-full flex flex-col antialiased bg-black text-white">
         {children}
         </body>
         </html>

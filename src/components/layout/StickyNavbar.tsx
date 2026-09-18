@@ -2,14 +2,15 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Category } from "@/types/database";
+import { Category, LocaleKey } from "@/types/database";
 import CategoryIcon from "@/components/ui/CategoryIcon";
 
 interface StickyNavbarProps {
     categories: Category[];
+    locale: LocaleKey;
 }
 
-export default function StickyNavbar({ categories }: StickyNavbarProps) {
+export default function StickyNavbar({ categories, locale }: StickyNavbarProps) {
     const [activeCategory, setActiveCategory] = useState<string>("");
     const navRef = useRef<HTMLUListElement>(null);
     const isClickScrolling = useRef<boolean>(false);
@@ -22,20 +23,17 @@ export default function StickyNavbar({ categories }: StickyNavbarProps) {
 
         const observer = new IntersectionObserver(
             (entries) => {
-                // Ignorăm observer-ul dacă utilizatorul a inițiat scroll-ul prin click
                 if (isClickScrolling.current) return;
 
-                // Găsim secțiunea care intersectează cel mai mult viewport-ul
                 const visibleSections = entries.filter((entry) => entry.isIntersecting);
                 if (visibleSections.length > 0) {
-                    // Sortăm pentru a o prinde pe cea cu vizibilitate maximă
                     visibleSections.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
                     const activeId = visibleSections[0].target.id.replace("category-", "");
                     setActiveCategory(activeId);
                 }
             },
             {
-                rootMargin: "-20% 0px -60% 0px", // Ajustare a zonei de declanșare
+                rootMargin: "-20% 0px -60% 0px",
                 threshold: [0, 0.25, 0.5, 0.75, 1],
             }
         );
@@ -68,7 +66,6 @@ export default function StickyNavbar({ categories }: StickyNavbarProps) {
             isClickScrolling.current = true;
             setActiveCategory(id);
 
-            // Compensare pentru înălțimea Navbar-ului (cca. 70px)
             const offset = 70;
             const elementPosition = targetElement.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.scrollY - offset;
@@ -78,7 +75,6 @@ export default function StickyNavbar({ categories }: StickyNavbarProps) {
                 behavior: "smooth",
             });
 
-            // Debounce pentru a reactiva IntersectionObserver
             setTimeout(() => {
                 isClickScrolling.current = false;
             }, 1000);
@@ -94,6 +90,7 @@ export default function StickyNavbar({ categories }: StickyNavbarProps) {
             >
                 {categories.map((category) => {
                     const isActive = activeCategory === category.id;
+                    const categoryName = category.name[locale] || category.name.ro;
 
                     return (
                         <li key={category.id} className="snap-start shrink-0 relative">
@@ -104,11 +101,11 @@ export default function StickyNavbar({ categories }: StickyNavbarProps) {
                                     isActive ? "text-neutral-950" : "text-neutral-400 hover:text-neutral-100"
                                 }`}
                             >
-                                {/* 2. Injectarea iconiței și a textului */}
+                                {/* 2. Injectarea iconiței și a textului tradus */}
                                 <span className="relative z-10 flex items-center gap-2">
-                  <CategoryIcon name={category.name} className="w-4 h-4" />
-                                    {category.name}
-                </span>
+                                    <CategoryIcon name={category.icon_name || "utensils"} className="w-4 h-4" />
+                                    {categoryName}
+                                </span>
 
                                 {isActive && (
                                     <motion.div
