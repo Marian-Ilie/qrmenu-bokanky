@@ -1,95 +1,105 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Info, Leaf, Snowflake } from "lucide-react";
-import { MenuItem } from "@/types/database";
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Info, Leaf, Snowflake } from 'lucide-react';
+import { MenuItem, LocaleKey } from '@/types/database'; // Ajustează calea
 
 interface MenuItemCardProps {
     item: MenuItem;
+    locale: LocaleKey;
 }
 
-export default function MenuItemCard({ item }: MenuItemCardProps) {
-    const [isNutritionOpen, setIsNutritionOpen] = useState(false);
+export default function MenuItemCard({ item, locale }: MenuItemCardProps) {
+    const [isExpanded, setIsExpanded] = useState(false);
 
-    // Verificăm dacă preparatul are date nutriționale pentru a randa butonul
-    const hasNutrition = item.energy_kcal != null;
+    // Extragerea traducerilor corecte pe baza limbii active
+    const itemName = item.name[locale];
+    const itemDesc = item.description ? item.description[locale] : null;
+    const hasNutrition = item.nutritional_info !== null;
 
     return (
-        <div className="flex flex-col gap-2 pb-6 border-b border-neutral-800/50 last:border-0">
-            <div className="flex justify-between items-start gap-3">
-                <h3 className="font-semibold text-base md:text-lg leading-tight text-neutral-100 pr-2">
-                    {item.title}
+        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+            {/* Header: Titlu și Preț */}
+            <div className="flex justify-between items-start gap-4">
+                <h3 className="text-lg font-semibold text-white leading-tight">
+                    {itemName}
                 </h3>
-                <span className="font-bold text-orange-500 whitespace-nowrap text-base shrink-0 mt-0.5">
-    {item.price} LEI
-  </span>
+                <span className="text-amber-400 font-bold whitespace-nowrap">
+          {item.price} LEI
+        </span>
             </div>
-            {item.ingredients && (
-                <p className="text-sm text-neutral-400 leading-relaxed mt-1 break-words">
-                    {item.ingredients}
+
+            {/* Descrierea (Ingredientele) */}
+            {itemDesc && (
+                <p className="text-neutral-400 text-sm leading-relaxed">
+                    {itemDesc}
                 </p>
             )}
 
-            {/* Rând pentru Alergeni și Tag-uri Speciale */}
-            <div className="flex flex-wrap gap-2 mt-1">
-                {item.allergens && (
-                    <span className="inline-flex items-center gap-1.5 text-xs bg-red-950/30 text-red-400 px-2.5 py-1 rounded-md border border-red-900/30">
-            Alergeni: {item.allergens}
-          </span>
-                )}
-                {item.frozen_ingredients && (
-                    <span className="inline-flex items-center gap-1.5 text-xs bg-blue-950/30 text-blue-400 px-2.5 py-1 rounded-md border border-blue-900/30">
-            <Snowflake size={12} />
-            Din produs congelat
-          </span>
-                )}
-            </div>
-
-            {/* Modulul Nutrițional (Progressive Disclosure) */}
+            {/* Progressive Disclosure: Butonul Info (Afișat doar dacă există date nutriționale) */}
             {hasNutrition && (
-                <div className="mt-2">
-                    <button
-                        onClick={() => setIsNutritionOpen(!isNutritionOpen)}
-                        className="inline-flex items-center gap-1.5 text-xs font-medium bg-neutral-900 hover:bg-neutral-800 text-neutral-300 px-3.5 py-2 rounded-xl transition-colors outline-none mt-2"
-                        aria-expanded={isNutritionOpen}
-                    >
-                        <Info size={14} className={isNutritionOpen ? "text-orange-500" : "text-neutral-400"} />
-                        Info Nutrițional ({item.energy_kcal} kcal)
-                    </button>
-
-                    <AnimatePresence>
-                        {isNutritionOpen && (
-                            <motion.div
-                                initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                                animate={{ height: "auto", opacity: 1, marginTop: 12 }}
-                                exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                                transition={{ duration: 0.3, ease: "easeInOut" }}
-                                className="overflow-hidden"
-                            >
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-neutral-900/50 rounded-lg border border-neutral-800/50 text-xs text-neutral-300">
-                                    <div className="flex flex-col">
-                                        <span className="text-neutral-500">Proteine</span>
-                                        <span className="font-medium">{item.protein_g}g</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-neutral-500">Lipide</span>
-                                        <span className="font-medium">{item.lipids_g}g</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-neutral-500">Carbohidrați</span>
-                                        <span className="font-medium">{item.carbs_g}g</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-neutral-500">Sare</span>
-                                        <span className="font-medium">{item.salt_g}g</span>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="flex items-center gap-2 text-xs font-medium text-neutral-500 hover:text-neutral-300 w-fit transition-colors mt-1"
+                >
+                    <Info size={14} />
+                    {locale === 'ro' ? 'Informații nutriționale' : 'Nutritional info'}
+                </button>
             )}
+
+            {/* Extensia Acordeon animată cu Framer Motion */}
+            <AnimatePresence>
+                {isExpanded && hasNutrition && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                    >
+                        <div className="pt-3 mt-2 border-t border-neutral-800 flex flex-col gap-3 text-xs text-neutral-400">
+
+                            {/* Calorii și Macronutrienți */}
+                            <div className="grid grid-cols-3 gap-2 bg-neutral-950 p-3 rounded-lg">
+                                <div><span className="block text-neutral-500">Kcal</span> <span className="text-white">{item.nutritional_info!.kcal}</span></div>
+                                <div><span className="block text-neutral-500">Proteine</span> <span className="text-white">{item.nutritional_info!.macros.proteins}g</span></div>
+                                <div><span className="block text-neutral-500">Grăsimi</span> <span className="text-white">{item.nutritional_info!.macros.fats}g</span></div>
+                                <div><span className="block text-neutral-500">Carbohidrați</span> <span className="text-white">{item.nutritional_info!.macros.carbs}g</span></div>
+                                <div><span className="block text-neutral-500">Fibre</span> <span className="text-white">{item.nutritional_info!.macros.fiber}g</span></div>
+                                <div><span className="block text-neutral-500">Sare</span> <span className="text-white">{item.nutritional_info!.macros.salt}g</span></div>
+                            </div>
+
+                            {/* Alergeni */}
+                            {item.nutritional_info!.allergens.length > 0 && (
+                                <div className="flex items-start gap-2">
+                                    <Leaf size={14} className="text-amber-500 shrink-0 mt-0.5" />
+                                    <p>
+                    <span className="font-semibold text-neutral-300">
+                      {locale === 'ro' ? 'Alergeni: ' : 'Allergens: '}
+                    </span>
+                                        {item.nutritional_info!.allergens.join(', ')}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Produse Decongelate */}
+                            {item.nutritional_info!.frozen_ingredients.length > 0 && (
+                                <div className="flex items-start gap-2">
+                                    <Snowflake size={14} className="text-blue-400 shrink-0 mt-0.5" />
+                                    <p>
+                    <span className="font-semibold text-neutral-300">
+                      {locale === 'ro' ? 'Din produs decongelat: ' : 'From thawed product: '}
+                    </span>
+                                        {item.nutritional_info!.frozen_ingredients.join(', ')}
+                                    </p>
+                                </div>
+                            )}
+
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
