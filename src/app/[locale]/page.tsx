@@ -1,4 +1,6 @@
-import StickyNavbar from '@/components/layout/StickyNavbar';
+import HeroHeader from '@/components/layout/HeroHeader';
+import FloatingMenu from '@/components/layout/FloatingMenu';
+import BestsellersCarousel from '@/components/ui/BestsellersCarousel';
 import MenuItemCard from '@/components/ui/MenuItemCard';
 import { Category, MenuItem, LocaleKey } from '@/types/database';
 import { supabase } from '@/lib/supabase';
@@ -8,67 +10,73 @@ export default async function MenuPage({
                                        }: {
     params: Promise<{ locale: string }>;
 }) {
-    // Extragem params conform convenției Next.js și facem narrowing la LocaleKey
     const { locale: rawLocale } = await params;
     const locale = (['ro', 'en'].includes(rawLocale) ? rawLocale : 'ro') as LocaleKey;
 
-    // 1. Fetch categorii ordonate după display_order
     const { data: categoriesData, error: catError } = await supabase
         .from('categories')
         .select('*')
         .order('display_order', { ascending: true });
 
-    // 2. Fetch toate produsele din meniu
     const { data: itemsData, error: itemsError } = await supabase
         .from('menu_items')
-        .select('*');
+        .select('*')
+        .order('display_order', { ascending: true });
 
     if (catError || itemsError) {
-        console.error('Eroare la preluarea datelor din Supabase:', catError || itemsError);
+        console.error('Eroare Supabase:', catError || itemsError);
     }
 
     const categories: Category[] = categoriesData || [];
-    const items: MenuItem[] = itemsData || [];
+    const allItems: MenuItem[] = itemsData || [];
+
+    const hiddenKeywords = ['margini', 'extra topping', 'cutie transport', 'pizza personalizată'];
+    const visibleItems = allItems.filter(item => {
+        const nameRo = item.name.ro.toLowerCase();
+        return !hiddenKeywords.some(keyword => nameRo.includes(keyword));
+    });
+
+    const activeCategories = categories.filter((category) =>
+        visibleItems.some((item) => item.category_id === category.id)
+    );
 
     return (
-        <main className="min-h-screen bg-neutral-950 text-white pb-24">
-            {/* Navbar-ul fix cu Scroll Spy, Auto-Centrare și suport i18n */}
-            <StickyNavbar categories={categories} locale={locale} />
+        <main className="min-h-screen bg-neutral-950 text-white pb-32 font-sans selection:bg-amber-500/30">
+            {/* 1. Antetul cu Logo, WiFi, Program și Limbi */}
+            <HeroHeader locale={locale} />
 
-            {/* Containerul principal al meniului structurat pe secțiuni și categorii */}
-            <div className="max-w-3xl mx-auto px-4 py-6 flex flex-col gap-10">
-                {categories.map((category) => {
-                    // Filtrăm produsele aparținând categoriei curente
-                    const categoryItems = items.filter((item) => item.category_id === category.id);
+            <div className="max-w-3xl mx-auto flex flex-col gap-10 mt-6">
+                {/* 2. Caruselul cu imagini Bestsellers */}
+                <BestsellersCarousel locale={locale} />
 
-                    // Dacă o categorie nu are produse în baza de date, o omitem din randare
-                    if (categoryItems.length === 0) return null;
+                {/* 3. Lista de Categorii și Produse */}
+                <div className="px-4 flex flex-col gap-12">
+                    {activeCategories.map((category) => {
+                        const categoryItems = visibleItems.filter((item) => item.category_id === category.id);
+                        const categoryName = category.name[locale] || category.name.ro;
 
-                    const categoryName = category.name[locale] || category.name.ro;
+                        return (
+                            <section key={category.id} id={`category-${category.id}`} className="scroll-mt-10">
+                                <div className="flex items-center gap-4 mb-6">
+                                    <h2 className="text-2xl font-black text-neutral-100 uppercase tracking-tight">
+                                        {categoryName}
+                                    </h2>
+                                    <div className="h-[2px] flex-1 bg-gradient-to-r from-neutral-800 to-transparent" />
+                                </div>
 
-                    return (
-                        <section
-                            key={category.id}
-                            id={`category-${category.id}`}
-                            className="scroll-mt-24 flex flex-col gap-4"
-                        >
-                            {/* Antetul categoriei (ancora fixă pentru Scroll Spy) */}
-                            <div className="sticky top-[73px] z-40 bg-neutral-950/90 backdrop-blur-md py-3 border-b border-neutral-800/80">
-                                <h2 className="text-xl font-bold text-white tracking-wide">
-                                    {categoryName}
-                                </h2>
-                            </div>
-
-                            {/* Listarea cardurilor de preparate */}
-                            <div className="flex flex-col gap-3">
-                                {categoryItems.map((item) => (
-                                    <MenuItemCard key={item.id} item={item} locale={locale} />
-                                ))}
-                            </div>
-                        </section>
-                    );
-                })}
+                                <div className="flex flex-col gap-4">
+                                    {categoryItems.map((item) => (
+                                        <MenuItemCard key={item.id} item={item} locale={locale} />
+                                    ))}
+                                </div>
+                            </section>
+                        );
+                    })}
+                </div>
             </div>
+
+            {/* 4. Butonul Meniu de Jos */}
+            <FloatingMenu categories={activeCategories} locale={locale} />
         </main>
     );
 }
