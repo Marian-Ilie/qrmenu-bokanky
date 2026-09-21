@@ -5,13 +5,13 @@ import { motion } from 'framer-motion';
 import { LocaleKey } from '@/types/database';
 
 const bestsellers = [
+    { id: 7, name: { ro: 'Pizza Fluffy', en: 'New Edition Pizza' }, price: 46, image: '/pizzafl.jpg', tag: 'Nou' },
     { id: 1, name: { ro: 'Pizza Canibale', en: 'Canibale Pizza' }, price: 45, image: '/pizza.jpg', tag: 'Popular' },
     { id: 2, name: { ro: 'Bruschete cu Roșii', en: 'Tomato Bruschetta' }, price: 21, image: '/bruscheta.jpg', tag: 'Fresh' },
     { id: 3, name: { ro: 'Burger', en: 'Burger' }, price: 41, image: '/burger.png', tag: 'Combo' },
     { id: 4, name: { ro: 'Quesadilla', en: 'Quesadilla' }, price: 39, image: '/quesadilla.jpg', tag: 'Combo' },
     { id: 5, name: { ro: 'Papanași', en: 'Traditional Papanași' }, price: 34, image: '/papanasi.jpg', tag: 'Desert' },
     { id: 6, name: { ro: 'Clatite', en: 'Traditional Pancakes' }, price: 28, image: '/clatite.jpg', tag: 'Desert' },
-    { id: 7, name: { ro: 'Nou: Pizza Fluffy', en: 'New Edition Pizza' }, price: 46, image: '/pizzafl.jpg', tag: 'Nou' },
 ];
 
 export default function BestsellersCarousel({ locale }: { locale: LocaleKey }) {
@@ -34,7 +34,6 @@ export default function BestsellersCarousel({ locale }: { locale: LocaleKey }) {
                     >
                         <div className="relative w-full h-48 rounded-2xl overflow-hidden shadow-2xl border border-neutral-800/80 bg-white">
 
-                            {/* Animație continuă de respirație (Ken Burns effect) */}
                             <motion.div
                                 animate={{ scale: [1, 1.07, 1] }}
                                 transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: index * 0.7 }}
@@ -46,11 +45,10 @@ export default function BestsellersCarousel({ locale }: { locale: LocaleKey }) {
                                     fill
                                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                                     sizes="(max-width: 768px) 256px, 256px"
-                                    priority={item.id === 1}
+                                    priority={item.id === 7}
                                 />
                             </motion.div>
 
-                            {/* Gradient de lizibilitate fix (nu se mișcă odată cu poza) */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent pointer-events-none" />
 
                             <div className="absolute top-3 left-3 z-10">
