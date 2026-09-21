@@ -2,6 +2,7 @@ import HeroHeader from '@/components/layout/HeroHeader';
 import FloatingMenu from '@/components/layout/FloatingMenu';
 import BestsellersCarousel from '@/components/ui/BestsellersCarousel';
 import MenuItemCard from '@/components/ui/MenuItemCard';
+import CategoryIcon from '@/components/ui/CategoryIcon';
 import { Category, MenuItem, LocaleKey } from '@/types/database';
 import { supabase } from '@/lib/supabase';
 
@@ -30,10 +31,21 @@ export default async function MenuPage({
     const categories: Category[] = categoriesData || [];
     const allItems: MenuItem[] = itemsData || [];
 
+    // 1. Toate cuvintele pe care vrem să le ASCUNDEM din lista principală
     const hiddenKeywords = ['margini', 'extra topping', 'cutie transport', 'pizza personalizată'];
+
     const visibleItems = allItems.filter(item => {
         const nameRo = item.name.ro.toLowerCase();
         return !hiddenKeywords.some(keyword => nameRo.includes(keyword));
+    });
+
+    // 2. Doar elementele pe care vrem să le ARĂTĂM în Modal (Pop-up)
+    // Am exclus 'pizza personalizată' de aici, deci va fi 100% invizibilă
+    const modalKeywords = ['margini', 'extra topping', 'cutie transport'];
+
+    const extraItems = allItems.filter(item => {
+        const nameRo = item.name.ro.toLowerCase();
+        return modalKeywords.some(keyword => nameRo.includes(keyword));
     });
 
     const activeCategories = categories.filter((category) =>
@@ -42,31 +54,45 @@ export default async function MenuPage({
 
     return (
         <main className="min-h-screen bg-neutral-950 text-white pb-32 font-sans selection:bg-amber-500/30">
-            {/* 1. Antetul cu Logo, WiFi, Program și Limbi */}
             <HeroHeader locale={locale} />
 
             <div className="max-w-3xl mx-auto flex flex-col gap-10 mt-6">
-                {/* 2. Caruselul cu imagini Bestsellers */}
                 <BestsellersCarousel locale={locale} />
 
-                {/* 3. Lista de Categorii și Produse */}
                 <div className="px-4 flex flex-col gap-12">
                     {activeCategories.map((category) => {
                         const categoryItems = visibleItems.filter((item) => item.category_id === category.id);
                         const categoryName = category.name[locale] || category.name.ro;
 
+                        const isDrinkCategory =
+                            category.name.ro.toLowerCase().includes('băuturi') ||
+                            category.name.ro.toLowerCase().includes('bere') ||
+                            category.name.ro.toLowerCase().includes('vin');
+
+                        const isPizzaCategory = category.name.ro.toLowerCase().includes('pizza');
+
                         return (
                             <section key={category.id} id={`category-${category.id}`} className="scroll-mt-10">
-                                <div className="flex items-center gap-4 mb-6">
-                                    <h2 className="text-2xl font-black text-neutral-100 uppercase tracking-tight">
+
+                                <div className="sticky top-0 z-40 bg-neutral-950/85 backdrop-blur-xl pt-4 pb-3 px-4 -mx-4 mb-4 border-b border-neutral-800/60 flex items-center gap-3 transition-all">
+                                    <div className="p-2 bg-neutral-900 rounded-xl text-amber-500 border border-neutral-800/50 shadow-inner">
+                                        <CategoryIcon name={category.name.ro} className="w-5 h-5" />
+                                    </div>
+                                    <h2 className="text-xl md:text-2xl font-black text-neutral-100 uppercase tracking-tight drop-shadow-md">
                                         {categoryName}
                                     </h2>
-                                    <div className="h-[2px] flex-1 bg-gradient-to-r from-neutral-800 to-transparent" />
                                 </div>
 
-                                <div className="flex flex-col gap-4">
+                                <div className={isDrinkCategory ? "grid grid-cols-2 gap-3" : "flex flex-col gap-4"}>
                                     {categoryItems.map((item) => (
-                                        <MenuItemCard key={item.id} item={item} locale={locale} />
+                                        <MenuItemCard
+                                            key={item.id}
+                                            item={item}
+                                            locale={locale}
+                                            categoryName={category.name.ro}
+                                            isCompact={isDrinkCategory}
+                                            extras={isPizzaCategory ? extraItems : []}
+                                        />
                                     ))}
                                 </div>
                             </section>
@@ -75,7 +101,6 @@ export default async function MenuPage({
                 </div>
             </div>
 
-            {/* 4. Butonul Meniu de Jos */}
             <FloatingMenu categories={activeCategories} locale={locale} />
         </main>
     );

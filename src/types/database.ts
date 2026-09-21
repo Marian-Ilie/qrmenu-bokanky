@@ -33,5 +33,7 @@ export interface MenuItem {
     price: number;
     image_url: string | null;
     is_bestseller: boolean;
+    is_vegan?: boolean;
+    is_spicy?: boolean;
     nutritional_info: NutritionalInfo | null;
 }

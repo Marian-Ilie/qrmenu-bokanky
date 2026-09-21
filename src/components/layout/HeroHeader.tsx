@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { MapPin, Clock, Wifi, Globe } from 'lucide-react';
 import { LocaleKey } from '@/types/database';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 interface HeroHeaderProps {
     locale: LocaleKey;
@@ -12,6 +13,10 @@ interface HeroHeaderProps {
 export default function HeroHeader({ locale }: HeroHeaderProps) {
     const router = useRouter();
     const pathname = usePathname();
+    const { scrollY } = useScroll();
+
+    // Imaginea se mută în jos cu 150px la fiecare 500px de scroll, creând efectul Parallax
+    const y = useTransform(scrollY, [0, 500], [0, 150]);
 
     const toggleLanguage = () => {
         const newLocale = locale === 'ro' ? 'en' : 'ro';
@@ -20,9 +25,9 @@ export default function HeroHeader({ locale }: HeroHeaderProps) {
     };
 
     return (
-        <header className="relative w-full h-[50vh] min-h-[420px] flex flex-col justify-end pb-8">
-            {/* Imaginea de Cover & Gradient */}
-            <div className="absolute inset-0 z-0">
+        <header className="relative w-full h-[50vh] min-h-[420px] flex flex-col justify-end pb-8 overflow-hidden">
+            {/* Imaginea de Cover Animată cu Parallax */}
+            <motion.div style={{ y }} className="absolute inset-0 z-0 scale-110 origin-top">
                 <Image
                     src="/cover.jpg"
                     alt="Bokanky Cover"
@@ -30,10 +35,11 @@ export default function HeroHeader({ locale }: HeroHeaderProps) {
                     priority
                     className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/40 via-neutral-950/70 to-neutral-950" />
-            </div>
+            </motion.div>
 
-            {/* Buton Comutare Limbă (Top Right) */}
+            {/* Gradient Fix (Nu se mișcă, face trecerea către negru) */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-b from-neutral-950/30 via-neutral-950/70 to-neutral-950" />
+
             <div className="absolute top-6 right-6 z-20">
                 <button
                     onClick={toggleLanguage}
@@ -44,44 +50,41 @@ export default function HeroHeader({ locale }: HeroHeaderProps) {
                 </button>
             </div>
 
-            {/* Conținutul Principal */}
             <div className="relative z-10 px-6 max-w-2xl mx-auto w-full flex flex-col items-center text-center gap-7">
-
-                {/* Integrare Logo Real */}
                 <div className="flex flex-col items-center gap-3 mt-4">
                     <div className="relative w-36 h-36 md:w-44 md:h-44 drop-shadow-2xl">
                         <Image
                             src="/bokanky_logo.png"
                             alt="Bokanky Logo"
                             fill
+                            sizes="(max-width: 768px) 144px, 176px"
                             className="object-contain"
                             priority
                         />
                     </div>
-                    <p className="text-amber-500 text-xs md:text-sm tracking-[0.25em] font-bold uppercase">
+                    <p className="text-amber-500 text-xs md:text-sm tracking-[0.25em] font-bold uppercase drop-shadow-md">
                         {locale === 'ro' ? 'Restaurant • Pizzerie' : 'Restaurant • Pizzeria'}
                     </p>
                 </div>
 
-                {/* Informații Utile (Glassmorphism Card) */}
-                <div className="w-full flex flex-col gap-3 bg-neutral-900/50 backdrop-blur-md p-4 rounded-2xl border border-neutral-800/60 shadow-2xl">
+                <div className="w-full flex flex-col gap-3 bg-neutral-900/40 backdrop-blur-md p-4 rounded-2xl border border-neutral-800/50 shadow-2xl">
                     <div className="flex justify-center gap-6 text-sm text-neutral-200">
                         <div className="flex items-center gap-2">
                             <Clock size={16} className="text-amber-500" />
-                            <span className="font-medium">L-V: 09-01 | S-D: 12-01</span>
+                            <span className="font-medium tracking-wide">L-V: 09-01 | S-D: 12-01</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <MapPin size={16} className="text-amber-500" />
-                            <span className="font-medium">Str. Horea 52</span>
+                            <span className="font-medium tracking-wide">Str. Horea 52</span>
                         </div>
                     </div>
 
-                    <div className="h-px w-full bg-gradient-to-r from-transparent via-neutral-700 to-transparent opacity-50" />
+                    <div className="h-px w-full bg-gradient-to-r from-transparent via-neutral-700/50 to-transparent" />
 
                     <div className="flex justify-center items-center gap-2 text-sm">
-                        <Wifi size={16} className="text-neutral-400" />
-                        <span className="font-medium text-white">bokanky pizzerie</span>
-                        <span className="text-neutral-600">|</span>
+                        <Wifi size={16} className="text-neutral-500" />
+                        <span className="font-medium text-neutral-300">bokanky pizzerie</span>
+                        <span className="text-neutral-700">|</span>
                         <span className="font-mono font-bold text-amber-500">arieseni2017</span>
                     </div>
                 </div>
