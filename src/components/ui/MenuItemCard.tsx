@@ -29,6 +29,26 @@ export default function MenuItemCard({ item, locale, categoryName, isCompact }: 
         visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } }
     };
 
+    // Funcție automată de traducere a alergenilor din baza de date
+    const translateAllergens = (allergens: string[]) => {
+        if (locale === 'ro') return allergens.join(', ');
+
+        const dict: Record<string, string> = {
+            'gluten': 'gluten',
+            'lactoză': 'lactose',
+            'ou': 'egg',
+            'ouă': 'eggs',
+            'pește': 'fish',
+            'fructe de mare': 'seafood',
+            'soia': 'soy',
+            'nuci': 'nuts',
+            'țelină': 'celery',
+            'muștar': 'mustard'
+        };
+
+        return allergens.map(a => dict[a.toLowerCase()] || a).join(', ');
+    };
+
     if (isCompact) {
         return (
             <motion.div
@@ -63,12 +83,12 @@ export default function MenuItemCard({ item, locale, categoryName, isCompact }: 
                 <div className="flex gap-2 mb-1 relative z-10">
                     {isSpicy && (
                         <span className="flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold text-red-400 bg-red-400/10 px-2 py-0.5 rounded-md w-fit border border-red-400/20">
-                            <Flame size={12} strokeWidth={2.5} /> Picant
+                            <Flame size={12} strokeWidth={2.5} /> {locale === 'ro' ? 'Picant' : 'Spicy'}
                         </span>
                     )}
                     {showVeganTag && (
                         <span className="flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md w-fit border border-emerald-400/20">
-                            <Leaf size={12} strokeWidth={2.5} /> De Post
+                            <Leaf size={12} strokeWidth={2.5} /> {locale === 'ro' ? 'De Post' : 'Vegan'}
                         </span>
                     )}
                 </div>
@@ -111,17 +131,17 @@ export default function MenuItemCard({ item, locale, categoryName, isCompact }: 
                         <div className="pt-4 mt-3 border-t border-neutral-800/40 flex flex-col gap-3 text-xs text-neutral-300">
                             <div className="grid grid-cols-3 gap-2 bg-neutral-950/60 p-3 rounded-2xl border border-neutral-800/30">
                                 <div><span className="block text-neutral-500 mb-0.5">Kcal</span> <span className="font-semibold">{item.nutritional_info!.kcal}</span></div>
-                                <div><span className="block text-neutral-500 mb-0.5">Proteine</span> <span className="font-semibold">{item.nutritional_info!.macros.proteins}g</span></div>
-                                <div><span className="block text-neutral-500 mb-0.5">Grăsimi</span> <span className="font-semibold">{item.nutritional_info!.macros.fats}g</span></div>
+                                <div><span className="block text-neutral-500 mb-0.5">{locale === 'ro' ? 'Proteine' : 'Protein'}</span> <span className="font-semibold">{item.nutritional_info!.macros.proteins}g</span></div>
+                                <div><span className="block text-neutral-500 mb-0.5">{locale === 'ro' ? 'Grăsimi' : 'Fat'}</span> <span className="font-semibold">{item.nutritional_info!.macros.fats}g</span></div>
                                 <div><span className="block text-neutral-500 mb-0.5">Carbs</span> <span className="font-semibold">{item.nutritional_info!.macros.carbs}g</span></div>
-                                <div><span className="block text-neutral-500 mb-0.5">Fibre</span> <span className="font-semibold">{item.nutritional_info!.macros.fiber}g</span></div>
-                                <div><span className="block text-neutral-500 mb-0.5">Sare</span> <span className="font-semibold">{item.nutritional_info!.macros.salt}g</span></div>
+                                <div><span className="block text-neutral-500 mb-0.5">{locale === 'ro' ? 'Fibre' : 'Fiber'}</span> <span className="font-semibold">{item.nutritional_info!.macros.fiber}g</span></div>
+                                <div><span className="block text-neutral-500 mb-0.5">{locale === 'ro' ? 'Sare' : 'Salt'}</span> <span className="font-semibold">{item.nutritional_info!.macros.salt}g</span></div>
                             </div>
 
                             {item.nutritional_info!.allergens.length > 0 && (
                                 <div className="flex items-start gap-2 bg-neutral-900/30 p-2 rounded-lg">
                                     <Leaf size={14} className="text-amber-500 shrink-0 mt-0.5" />
-                                    <p><span className="font-semibold text-neutral-400">{locale === 'ro' ? 'Alergeni: ' : 'Allergens: '}</span>{item.nutritional_info!.allergens.join(', ')}</p>
+                                    <p><span className="font-semibold text-neutral-400">{locale === 'ro' ? 'Alergeni: ' : 'Allergens: '}</span>{translateAllergens(item.nutritional_info!.allergens)}</p>
                                 </div>
                             )}
 
