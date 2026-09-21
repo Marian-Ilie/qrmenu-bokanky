@@ -15,7 +15,6 @@ export default function HeroHeader({ locale }: HeroHeaderProps) {
     const pathname = usePathname();
     const { scrollY } = useScroll();
 
-    // Imaginea se mută în jos cu 150px la fiecare 500px de scroll, creând efectul Parallax
     const y = useTransform(scrollY, [0, 500], [0, 150]);
 
     const toggleLanguage = () => {
@@ -26,18 +25,10 @@ export default function HeroHeader({ locale }: HeroHeaderProps) {
 
     return (
         <header className="relative w-full h-[50vh] min-h-[420px] flex flex-col justify-end pb-8 overflow-hidden">
-            {/* Imaginea de Cover Animată cu Parallax */}
             <motion.div style={{ y }} className="absolute inset-0 z-0 scale-110 origin-top">
-                <Image
-                    src="/cover.jpg"
-                    alt="Bokanky Cover"
-                    fill
-                    priority
-                    className="object-cover"
-                />
+                <Image src="/cover.jpg" alt="Bokanky Cover" fill priority className="object-cover" />
             </motion.div>
 
-            {/* Gradient Fix (Nu se mișcă, face trecerea către negru) */}
             <div className="absolute inset-0 z-0 bg-gradient-to-b from-neutral-950/30 via-neutral-950/70 to-neutral-950" />
 
             <div className="absolute top-6 right-6 z-20">
@@ -53,29 +44,30 @@ export default function HeroHeader({ locale }: HeroHeaderProps) {
             <div className="relative z-10 px-6 max-w-2xl mx-auto w-full flex flex-col items-center text-center gap-7">
                 <div className="flex flex-col items-center gap-3 mt-4">
                     <div className="relative w-36 h-36 md:w-44 md:h-44 drop-shadow-2xl">
-                        <Image
-                            src="/bokanky_logo.png"
-                            alt="Bokanky Logo"
-                            fill
-                            sizes="(max-width: 768px) 144px, 176px"
-                            className="object-contain"
-                            priority
-                        />
+                        <Image src="/bokanky_logo.png" alt="Bokanky Logo" fill sizes="(max-width: 768px) 144px, 176px" className="object-contain" priority />
                     </div>
                     <p className="text-amber-500 text-xs md:text-sm tracking-[0.25em] font-bold uppercase drop-shadow-md">
                         {locale === 'ro' ? 'Restaurant • Pizzerie' : 'Restaurant • Pizzeria'}
                     </p>
                 </div>
 
-                <div className="w-full flex flex-col gap-3 bg-neutral-900/40 backdrop-blur-md p-4 rounded-2xl border border-neutral-800/50 shadow-2xl">
-                    <div className="flex justify-center gap-6 text-sm text-neutral-200">
-                        <div className="flex items-center gap-2">
-                            <Clock size={16} className="text-amber-500" />
-                            <span className="font-medium tracking-wide">L-V: 09-01 | S-D: 12-01</span>
+                <div className="w-full flex flex-col gap-4 bg-neutral-900/40 backdrop-blur-md p-5 rounded-2xl border border-neutral-800/50 shadow-2xl">
+                    <div className="flex justify-center gap-8 text-sm text-neutral-200">
+                        {/* Program așezat forțat pe 2 rânduri curate */}
+                        <div className="flex items-center gap-2.5">
+                            <Clock size={18} className="text-amber-500 shrink-0" />
+                            <div className="flex flex-col text-left font-medium tracking-wide leading-tight">
+                                <span>L-V: 09-01</span>
+                                <span>S-D: 12-01</span>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <MapPin size={16} className="text-amber-500" />
-                            <span className="font-medium tracking-wide">Str. Horea 52</span>
+                        {/* Locație */}
+                        <div className="flex items-center gap-2.5">
+                            <MapPin size={18} className="text-amber-500 shrink-0" />
+                            <div className="flex flex-col text-left font-medium tracking-wide leading-tight">
+                                <span>Str. Horea</span>
+                                <span>Nr. 52</span>
+                            </div>
                         </div>
                     </div>
 
