@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
-import { MapPin, Clock, Wifi, Globe } from 'lucide-react';
+import { MapPin, Clock, Wifi, Globe, Phone } from 'lucide-react';
 import { LocaleKey } from '@/types/database';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
@@ -53,7 +53,7 @@ export default function HeroHeader({ locale }: HeroHeaderProps) {
 
                 <div className="w-full flex flex-col gap-4 bg-neutral-900/40 backdrop-blur-md p-5 rounded-2xl border border-neutral-800/50 shadow-2xl">
                     <div className="flex justify-center gap-8 text-sm text-neutral-200">
-                        {/* Program așezat forțat pe 2 rânduri curate */}
+                        {/* Program */}
                         <div className="flex items-center gap-2.5">
                             <Clock size={18} className="text-amber-500 shrink-0" />
                             <div className="flex flex-col text-left font-medium tracking-wide leading-tight">
@@ -73,11 +73,19 @@ export default function HeroHeader({ locale }: HeroHeaderProps) {
 
                     <div className="h-px w-full bg-gradient-to-r from-transparent via-neutral-700/50 to-transparent" />
 
-                    <div className="flex justify-center items-center gap-2 text-sm">
-                        <Wifi size={16} className="text-neutral-500" />
-                        <span className="font-medium text-neutral-300">bokanky pizzerie</span>
-                        <span className="text-neutral-700">|</span>
-                        <span className="font-mono font-bold text-amber-500">arieseni2017</span>
+                    {/* Telefon & Wi-Fi */}
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-5 text-sm">
+                        <a href="tel:0770785504" className="flex items-center gap-2 group">
+                            <Phone size={16} className="text-amber-500 group-hover:text-amber-400 transition-colors" />
+                            <span className="font-medium text-neutral-200 group-hover:text-white transition-colors tracking-wide">0770 785 504</span>
+                        </a>
+                        <span className="hidden sm:block text-neutral-700">|</span>
+                        <div className="flex items-center gap-2">
+                            <Wifi size={16} className="text-neutral-500" />
+                            <span className="font-medium text-neutral-300">bokanky pizzerie</span>
+                            <span className="text-neutral-700">-</span>
+                            <span className="font-mono font-bold text-amber-500">arieseni2017</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -19,7 +19,12 @@ export default function MenuItemCard({ item, locale, categoryName, isCompact }: 
     const itemDesc = item.description ? (item.description[locale] || item.description.ro) : null;
     const hasNutrition = item.nutritional_info !== null;
 
+    // Logica pentru Picant vs Ușor Picant
     const isSpicy = item.is_spicy === true;
+    const mildKeywords = ['aripioare', 'sweet', 'chili', 'chilly'];
+    const isMildlySpicy = isSpicy && mildKeywords.some(keyword => item.name.ro.toLowerCase().includes(keyword));
+    const isVerySpicy = isSpicy && !isMildlySpicy;
+
     const isVeganItem = item.is_vegan === true;
     const isVeganCategory = categoryName?.toLowerCase().includes('post') || categoryName?.toLowerCase().includes('vegan');
     const showVeganTag = isVeganItem && !isVeganCategory;
@@ -29,21 +34,13 @@ export default function MenuItemCard({ item, locale, categoryName, isCompact }: 
         visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } }
     };
 
-    // Funcție automată de traducere a alergenilor din baza de date
     const translateAllergens = (allergens: string[]) => {
         if (locale === 'ro') return allergens.join(', ');
 
         const dict: Record<string, string> = {
-            'gluten': 'gluten',
-            'lactoză': 'lactose',
-            'ou': 'egg',
-            'ouă': 'eggs',
-            'pește': 'fish',
-            'fructe de mare': 'seafood',
-            'soia': 'soy',
-            'nuci': 'nuts',
-            'țelină': 'celery',
-            'muștar': 'mustard'
+            'gluten': 'gluten', 'lactoză': 'lactose', 'ou': 'egg', 'ouă': 'eggs',
+            'pește': 'fish', 'fructe de mare': 'seafood', 'soia': 'soy',
+            'nuci': 'nuts', 'țelină': 'celery', 'muștar': 'mustard'
         };
 
         return allergens.map(a => dict[a.toLowerCase()] || a).join(', ');
@@ -80,10 +77,15 @@ export default function MenuItemCard({ item, locale, categoryName, isCompact }: 
             <div className="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
 
             {(isSpicy || showVeganTag) && (
-                <div className="flex gap-2 mb-1 relative z-10">
-                    {isSpicy && (
+                <div className="flex flex-wrap gap-2 mb-1 relative z-10">
+                    {isVerySpicy && (
                         <span className="flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold text-red-400 bg-red-400/10 px-2 py-0.5 rounded-md w-fit border border-red-400/20">
                             <Flame size={12} strokeWidth={2.5} /> {locale === 'ro' ? 'Picant' : 'Spicy'}
+                        </span>
+                    )}
+                    {isMildlySpicy && (
+                        <span className="flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded-md w-fit border border-orange-400/20">
+                            <Flame size={12} strokeWidth={2.5} /> {locale === 'ro' ? 'Ușor Picant' : 'Mildly Spicy'}
                         </span>
                     )}
                     {showVeganTag && (
