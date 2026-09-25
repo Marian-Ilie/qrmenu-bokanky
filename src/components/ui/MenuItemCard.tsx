@@ -1,95 +1,162 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Info, Leaf, Snowflake } from "lucide-react";
-import { MenuItem } from "@/types/database";
+import { useState } from 'react';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { Info, Leaf, Snowflake, Flame } from 'lucide-react';
+import { MenuItem, LocaleKey } from '@/types/database';
 
 interface MenuItemCardProps {
-    item: MenuItem;
+    item: MenuItem & { is_vegan?: boolean; is_spicy?: boolean };
+    locale: LocaleKey;
+    categoryName?: string;
+    isCompact?: boolean;
 }
 
-export default function MenuItemCard({ item }: MenuItemCardProps) {
-    const [isNutritionOpen, setIsNutritionOpen] = useState(false);
+export default function MenuItemCard({ item, locale, categoryName, isCompact }: MenuItemCardProps) {
+    const [isExpanded, setIsExpanded] = useState(false);
 
-    // Verificăm dacă preparatul are date nutriționale pentru a randa butonul
-    const hasNutrition = item.energy_kcal != null;
+    const itemName = item.name[locale] || item.name.ro;
+    const itemDesc = item.description ? (item.description[locale] || item.description.ro) : null;
+    const hasNutrition = item.nutritional_info !== null;
+
+    // Logica pentru Picant vs Ușor Picant
+    const isSpicy = item.is_spicy === true;
+    const mildKeywords = ['aripioare', 'sweet', 'chili', 'chilly'];
+    const isMildlySpicy = isSpicy && mildKeywords.some(keyword => item.name.ro.toLowerCase().includes(keyword));
+    const isVerySpicy = isSpicy && !isMildlySpicy;
+
+    const isVeganItem = item.is_vegan === true;
+    const isVeganCategory = categoryName?.toLowerCase().includes('post') || categoryName?.toLowerCase().includes('vegan');
+    const showVeganTag = isVeganItem && !isVeganCategory;
+
+    const cardVariants: Variants = {
+        hidden: { opacity: 0, y: 15 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } }
+    };
+
+    const translateAllergens = (allergens: string[]) => {
+        if (locale === 'ro') return allergens.join(', ');
+
+        const dict: Record<string, string> = {
+            'gluten': 'gluten', 'lactoză': 'lactose', 'ou': 'egg', 'ouă': 'eggs',
+            'pește': 'fish', 'fructe de mare': 'seafood', 'soia': 'soy',
+            'nuci': 'nuts', 'țelină': 'celery', 'muștar': 'mustard'
+        };
+
+        return allergens.map(a => dict[a.toLowerCase()] || a).join(', ');
+    };
+
+    if (isCompact) {
+        return (
+            <motion.div
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-20px" }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-neutral-900/40 backdrop-blur-sm border border-neutral-800/40 rounded-2xl p-3 flex flex-col justify-between gap-3 h-full shadow-[0_4px_20px_rgb(0,0,0,0.2)]"
+            >
+                <h3 className="text-[15px] font-bold text-neutral-200 leading-snug tracking-tight">
+                    {itemName}
+                </h3>
+                <span className="text-amber-500 font-black text-sm bg-neutral-950/80 px-2.5 py-1 rounded-lg w-fit border border-amber-500/10 shadow-sm">
+                    {item.price} LEI
+                </span>
+            </motion.div>
+        );
+    }
 
     return (
-        <div className="flex flex-col gap-2 pb-6 border-b border-neutral-800/50 last:border-0">
-            <div className="flex justify-between items-start gap-3">
-                <h3 className="font-semibold text-base md:text-lg leading-tight text-neutral-100 pr-2">
-                    {item.title}
+        <motion.div
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-20px" }}
+            className="bg-neutral-900/40 backdrop-blur-sm border border-neutral-800/40 rounded-3xl p-4 shadow-[0_4px_20px_rgb(0,0,0,0.2)] flex flex-col gap-2 relative overflow-hidden"
+        >
+            <div className="absolute -top-10 -left-10 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+
+            {(isSpicy || showVeganTag) && (
+                <div className="flex flex-wrap gap-2 mb-1 relative z-10">
+                    {isVerySpicy && (
+                        <span className="flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold text-red-400 bg-red-400/10 px-2 py-0.5 rounded-md w-fit border border-red-400/20">
+                            <Flame size={12} strokeWidth={2.5} /> {locale === 'ro' ? 'Picant' : 'Spicy'}
+                        </span>
+                    )}
+                    {isMildlySpicy && (
+                        <span className="flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded-md w-fit border border-orange-400/20">
+                            <Flame size={12} strokeWidth={2.5} /> {locale === 'ro' ? 'Ușor Picant' : 'Mildly Spicy'}
+                        </span>
+                    )}
+                    {showVeganTag && (
+                        <span className="flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md w-fit border border-emerald-400/20">
+                            <Leaf size={12} strokeWidth={2.5} /> {locale === 'ro' ? 'De Post' : 'Vegan'}
+                        </span>
+                    )}
+                </div>
+            )}
+
+            <div className="flex justify-between items-start gap-4 relative z-10">
+                <h3 className="text-lg font-bold text-neutral-100 leading-tight tracking-tight">
+                    {itemName}
                 </h3>
-                <span className="font-bold text-orange-500 whitespace-nowrap text-base shrink-0 mt-0.5">
-    {item.price} LEI
-  </span>
+                <span className="text-amber-500 font-black whitespace-nowrap bg-neutral-950/80 px-3 py-1.5 rounded-xl text-sm border border-amber-500/10 shadow-sm">
+                    {item.price} LEI
+                </span>
             </div>
-            {item.ingredients && (
-                <p className="text-sm text-neutral-400 leading-relaxed mt-1 break-words">
-                    {item.ingredients}
+
+            {itemDesc && (
+                <p className="text-neutral-400 text-[13px] leading-relaxed pr-6 relative z-10">
+                    {itemDesc}
                 </p>
             )}
 
-            {/* Rând pentru Alergeni și Tag-uri Speciale */}
-            <div className="flex flex-wrap gap-2 mt-1">
-                {item.allergens && (
-                    <span className="inline-flex items-center gap-1.5 text-xs bg-red-950/30 text-red-400 px-2.5 py-1 rounded-md border border-red-900/30">
-            Alergeni: {item.allergens}
-          </span>
-                )}
-                {item.frozen_ingredients && (
-                    <span className="inline-flex items-center gap-1.5 text-xs bg-blue-950/30 text-blue-400 px-2.5 py-1 rounded-md border border-blue-900/30">
-            <Snowflake size={12} />
-            Din produs congelat
-          </span>
-                )}
-            </div>
-
-            {/* Modulul Nutrițional (Progressive Disclosure) */}
             {hasNutrition && (
-                <div className="mt-2">
-                    <button
-                        onClick={() => setIsNutritionOpen(!isNutritionOpen)}
-                        className="inline-flex items-center gap-1.5 text-xs font-medium bg-neutral-900 hover:bg-neutral-800 text-neutral-300 px-3.5 py-2 rounded-xl transition-colors outline-none mt-2"
-                        aria-expanded={isNutritionOpen}
-                    >
-                        <Info size={14} className={isNutritionOpen ? "text-orange-500" : "text-neutral-400"} />
-                        Info Nutrițional ({item.energy_kcal} kcal)
-                    </button>
-
-                    <AnimatePresence>
-                        {isNutritionOpen && (
-                            <motion.div
-                                initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                                animate={{ height: "auto", opacity: 1, marginTop: 12 }}
-                                exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                                transition={{ duration: 0.3, ease: "easeInOut" }}
-                                className="overflow-hidden"
-                            >
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-neutral-900/50 rounded-lg border border-neutral-800/50 text-xs text-neutral-300">
-                                    <div className="flex flex-col">
-                                        <span className="text-neutral-500">Proteine</span>
-                                        <span className="font-medium">{item.protein_g}g</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-neutral-500">Lipide</span>
-                                        <span className="font-medium">{item.lipids_g}g</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-neutral-500">Carbohidrați</span>
-                                        <span className="font-medium">{item.carbs_g}g</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-neutral-500">Sare</span>
-                                        <span className="font-medium">{item.salt_g}g</span>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-neutral-500 hover:text-neutral-300 transition-colors py-1.5 relative z-10 mt-1"
+                >
+                    <Info size={14} />
+                    {locale === 'ro' ? 'Valori nutriționale' : 'Nutritional info'}
+                </button>
             )}
-        </div>
+
+            <AnimatePresence>
+                {isExpanded && hasNutrition && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden relative z-10"
+                    >
+                        <div className="pt-4 mt-3 border-t border-neutral-800/40 flex flex-col gap-3 text-xs text-neutral-300">
+                            <div className="grid grid-cols-3 gap-2 bg-neutral-950/60 p-3 rounded-2xl border border-neutral-800/30">
+                                <div><span className="block text-neutral-500 mb-0.5">Kcal</span> <span className="font-semibold">{item.nutritional_info!.kcal}</span></div>
+                                <div><span className="block text-neutral-500 mb-0.5">{locale === 'ro' ? 'Proteine' : 'Protein'}</span> <span className="font-semibold">{item.nutritional_info!.macros.proteins}g</span></div>
+                                <div><span className="block text-neutral-500 mb-0.5">{locale === 'ro' ? 'Grăsimi' : 'Fat'}</span> <span className="font-semibold">{item.nutritional_info!.macros.fats}g</span></div>
+                                <div><span className="block text-neutral-500 mb-0.5">Carbs</span> <span className="font-semibold">{item.nutritional_info!.macros.carbs}g</span></div>
+                                <div><span className="block text-neutral-500 mb-0.5">{locale === 'ro' ? 'Fibre' : 'Fiber'}</span> <span className="font-semibold">{item.nutritional_info!.macros.fiber}g</span></div>
+                                <div><span className="block text-neutral-500 mb-0.5">{locale === 'ro' ? 'Sare' : 'Salt'}</span> <span className="font-semibold">{item.nutritional_info!.macros.salt}g</span></div>
+                            </div>
+
+                            {item.nutritional_info!.allergens.length > 0 && (
+                                <div className="flex items-start gap-2 bg-neutral-900/30 p-2 rounded-lg">
+                                    <Leaf size={14} className="text-amber-500 shrink-0 mt-0.5" />
+                                    <p><span className="font-semibold text-neutral-400">{locale === 'ro' ? 'Alergeni: ' : 'Allergens: '}</span>{translateAllergens(item.nutritional_info!.allergens)}</p>
+                                </div>
+                            )}
+
+                            {item.nutritional_info!.frozen_ingredients.length > 0 && (
+                                <div className="flex items-start gap-2 bg-neutral-900/30 p-2 rounded-lg">
+                                    <Snowflake size={14} className="text-blue-400 shrink-0 mt-0.5" />
+                                    <p><span className="font-semibold text-neutral-400">{locale === 'ro' ? 'Din produs decongelat: ' : 'From thawed product: '}</span>{item.nutritional_info!.frozen_ingredients.join(', ')}</p>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 }

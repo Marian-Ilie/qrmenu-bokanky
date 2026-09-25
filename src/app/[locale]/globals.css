@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* Scroll lin pentru toată aplicația */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Setări generale de fundal (folosim sintaxa nouă @theme sau CSS pur) */
+body {
+    background-color: #0a0a0a; /* neutral-950 */
+    color: #fafafa; /* neutral-50 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ascundem bara de scroll generală (Chrome, Safari, Opera) */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+/* Utilitar pentru ascunderea scrollbar-ului orizontal în carusel */
+@layer utilities {
+    .hide-scrollbar {
+        -ms-overflow-style: none; /* IE și Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+}
