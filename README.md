@@ -1,4 +1,5 @@
 # 🍕 Bokanky Pizzeria - Digital Menu & Phygital Experience
+🔗 **Live Menu:** [Bokanky Menu](https://meniu.bokankypizza.ro/en)
 
 A high-performance, mobile-first digital menu built for a local restaurant&pizzeria. This project represents a complete end-to-end overhaul of the restaurant's digital infrastructure, transitioning from an obsolete, slow third-party system to a custom-built, blazing-fast web application.
 
