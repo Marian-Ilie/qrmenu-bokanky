@@ -5,13 +5,13 @@ import { motion } from 'framer-motion';
 import { LocaleKey } from '@/types/database';
 
 const bestsellers = [
-    { id: 7, name: { ro: 'Pizza Fluffy', en: 'New Edition Pizza' }, price: 46, image: '/pizzafl.jpg', tag: 'Nou' },
-    { id: 1, name: { ro: 'Pizza Canibale', en: 'Canibale Pizza' }, price: 45, image: '/pizza.jpg', tag: 'Popular' },
-    { id: 2, name: { ro: 'Bruschete cu Roșii', en: 'Tomato Bruschetta' }, price: 21, image: '/bruscheta.jpg', tag: 'Fresh' },
-    { id: 3, name: { ro: 'Burger', en: 'Burger' }, price: 41, image: '/burger.png', tag: 'Combo' },
-    { id: 4, name: { ro: 'Quesadilla', en: 'Quesadilla' }, price: 39, image: '/quesadilla.jpg', tag: 'Combo' },
-    { id: 5, name: { ro: 'Papanași', en: 'Traditional Papanași' }, price: 34, image: '/papanasi.jpg', tag: 'Desert' },
-    { id: 6, name: { ro: 'Clatite', en: 'Traditional Pancakes' }, price: 28, image: '/clatite.jpg', tag: 'Desert' },
+    { id: 7, name: { ro: 'Pizza Fluffy', en: 'New Edition Pizza' }, price: 46, image: '/pizzafl.jpg', tag: { ro: 'Nou', en: 'New' }, isNew: true },
+    { id: 1, name: { ro: 'Pizza Canibale', en: 'Canibale Pizza' }, price: 45, image: '/pizza.jpg', tag: { ro: 'Popular', en: 'Popular' } },
+    { id: 2, name: { ro: 'Bruschete cu Roșii', en: 'Tomato Bruschetta' }, price: 21, image: '/bruscheta.jpg', tag: { ro: 'Fresh', en: 'Fresh' } },
+    { id: 3, name: { ro: 'Burger', en: 'Burger' }, price: 41, image: '/burger.png', tag: { ro: 'Combo', en: 'Combo' } },
+    { id: 4, name: { ro: 'Quesadilla', en: 'Quesadilla' }, price: 39, image: '/quesadilla.jpg', tag: { ro: 'Combo', en: 'Combo' } },
+    { id: 5, name: { ro: 'Papanași', en: 'Traditional Papanași' }, price: 34, image: '/papanasi.jpg', tag: { ro: 'Desert', en: 'Dessert' } },
+    { id: 6, name: { ro: 'Clătite', en: 'Traditional Pancakes' }, price: 28, image: '/clatite.jpg', tag: { ro: 'Desert', en: 'Dessert' } },
 ];
 
 export default function BestsellersCarousel({ locale }: { locale: LocaleKey }) {
@@ -30,13 +30,12 @@ export default function BestsellersCarousel({ locale }: { locale: LocaleKey }) {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, delay: index * 0.1, ease: 'easeOut' }}
-                        className="snap-start shrink-0 w-64 flex flex-col gap-3 group cursor-pointer"
+                        className="snap-start shrink-0 w-64 flex flex-col gap-3 group"
                     >
-                        <div className="relative w-full h-48 rounded-2xl overflow-hidden shadow-2xl border border-neutral-800/80 bg-white">
-
+                        <div className="relative w-full h-48 rounded-2xl overflow-hidden shadow-2xl border border-neutral-800/80 bg-neutral-900">
                             <motion.div
                                 animate={{ scale: [1, 1.07, 1] }}
-                                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: index * 0.7 }}
+                                transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: index * 0.7 }}
                                 className="absolute inset-0"
                             >
                                 <Image
@@ -44,7 +43,7 @@ export default function BestsellersCarousel({ locale }: { locale: LocaleKey }) {
                                     alt={item.name[locale] || item.name.ro}
                                     fill
                                     className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                    sizes="(max-width: 768px) 256px, 256px"
+                                    sizes="256px"
                                     priority={item.id === 7}
                                 />
                             </motion.div>
@@ -52,8 +51,12 @@ export default function BestsellersCarousel({ locale }: { locale: LocaleKey }) {
                             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent pointer-events-none" />
 
                             <div className="absolute top-3 left-3 z-10">
-                                <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-lg ${item.tag === 'Nou' ? 'bg-red-500 text-white' : 'bg-amber-500 text-neutral-950'}`}>
-                                    {item.tag}
+                                <span
+                                    className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-lg ${
+                                        item.isNew ? 'bg-red-500 text-white' : 'bg-amber-500 text-neutral-950'
+                                    }`}
+                                >
+                                    {item.tag[locale] || item.tag.ro}
                                 </span>
                             </div>
 

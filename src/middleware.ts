@@ -8,6 +8,7 @@ export default createMiddleware({
 });
 
 export const config = {
-    // Aplică middleware-ul pe toate rutele, ignorând fișierele statice, API-urile și Vercel internals
-    matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+    matcher: [
+        '/((?!api|_next/static|_next/image|favicon.ico|icon.png|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    ],
 };
